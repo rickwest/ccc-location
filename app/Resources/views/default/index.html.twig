@@ -1,0 +1,124 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="collapse bg-inverse" id="navbarHeader">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-8 py-4">
+                    <h4 class="text-white">About</h4>
+                    <p class="text-muted">Little project to show the location of Career Change Coders around the world!<br>
+                        Built with Symfony, Javascript and Boostrap. Want to contribute?...submit a PR on GitHub :-)</p>
+                </div>
+                <div class="col-sm-4 py-4">
+                    <h4 class="text-white">Contact</h4>
+                    <ul class="list-unstyled">
+                        <li><a href="https://medium.com/career-change-coder" class="text-white">Read on Medium</a></li>
+                        <li><a href="https://careerchangecoders.herokuapp.com/" class="text-white">Join on Slack</a></li>
+                        <li><a href="https://www.facebook.com/groups/1808933362696140/" class="text-white">Like on Facebook</a></li>
+                        <li><a href="#" class="text-white">Github</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="navbar navbar-inverse bg-inverse">
+        <div class="container d-flex justify-content-between">
+            <a href="/" class="navbar-brand">Career Change Coders</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </div>
+
+    <section class="jumbotron text-center">
+        <div class="container">
+            <h1 class="jumbotron-heading">User Locations</h1>
+            <p class="lead text-muted">Enter your username and location to add yourself to our map!</p>
+            <p class="text-center">
+            <form class="form">
+                <div class="input-group">
+                    <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="username" placeholder="Username">
+                    <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="locationInput" placeholder="Location">
+                    <button type="submit" class="btn btn-primary">Add me</button>
+                    <input type="hidden" id="location_lat">
+                    <input type="hidden" id="location_lon">
+                </div>
+            </form>
+            </p>
+        </div>
+    </section>
+
+    <div class="album text-muted">
+        <div class="container">
+            <div class="row">
+                <div class="card">
+                    <div id="map" style="width:100%; height:650px"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-muted">
+        <div class="container">
+            <p class="float-right">
+                <a href="#">Back to top</a>
+            </p>
+            <p>&copy; Career Change Coders</p>
+            <p>If you find a mistake or can improve our code, please feel free to submit a PR on <a href="">Github.</a></p>
+        </div>
+    </footer>
+    {% endblock %}
+
+    {% block javascript %}
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAqACoKPqvIrZ1EQp-njyExDg0oYaG_64o&libraries=places"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 2,
+                scrollwheel: false,
+                center: new google.maps.LatLng(53.3811, 1.4701)
+            });
+            $.get("/users", function (data) {
+                $.each(data, function (index, value) {
+                    new google.maps.Marker({
+                        position: new google.maps.LatLng(value.lat, value.lon),
+                        map: map
+                    });
+                });
+            });
+
+            var locationInput = document.getElementById('locationInput');
+            var locationAutocomplete = new google.maps.places.Autocomplete(locationInput);
+
+            locationAutocomplete.addListener('place_changed', function() {
+
+            var location = locationAutocomplete.getPlace();
+
+            document.getElementById('location_lat').value = location.geometry.location.lat();
+            document.getElementById('location_lon').value = location.geometry.location.lng();
+            });
+
+            $('form').submit(function(e) {
+                e.preventDefault();
+
+                var data = {
+                    username: $('#username').val(),
+                    lat: $('#location_lat').val(),
+                    lon: $('#location_lon').val()
+                };
+
+                $.ajax({
+                    type: 'post',
+                    url: '/addLocation',
+                    data: data,
+                    dataType: 'json'
+                }).done(function(data) {
+                    new google.maps.Marker({
+                    position: new google.maps.LatLng(data.lat, data.lon),
+                    map: map
+                    });
+                })
+            })
+        });
+    </script>
+{% endblock %}
