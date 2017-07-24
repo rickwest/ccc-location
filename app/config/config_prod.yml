@@ -22,3 +22,6 @@ monolog:
         console:
             type: console
             process_psr_3_messages: false
+doctrine:
+    dbal:
+        driver: pdo_pgsql
