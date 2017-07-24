@@ -37,14 +37,15 @@
             <p class="text-center">
             <form class="form">
                 <div class="input-group">
-                    <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="username" placeholder="Username">
+                    <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0 has-danger" id="usernameInput" placeholder="Username">
                     <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="locationInput" placeholder="Location">
-                    <button type="submit" class="btn btn-primary">Add me</button>
+                    <button id="submit" type="submit" class="btn btn-primary">Add me</button>
                     <input type="hidden" id="location_lat">
                     <input type="hidden" id="location_lon">
                 </div>
             </form>
             </p>
+            <ul id="errors" class="text-danger"></ul>
         </div>
     </section>
 
@@ -100,24 +101,40 @@
 
             $('form').submit(function(e) {
                 e.preventDefault();
+                var username = $('#usernameInput').val();
+                var lat =  $('#location_lat').val();
+                var lon = $('#location_lon').val();
 
-                var data = {
-                    username: $('#username').val(),
-                    lat: $('#location_lat').val(),
-                    lon: $('#location_lon').val()
-                };
+                var errors = [];
 
-                $.ajax({
-                    type: 'post',
-                    url: '/addLocation',
-                    data: data,
-                    dataType: 'json'
-                }).done(function(data) {
-                    new google.maps.Marker({
-                    position: new google.maps.LatLng(data.lat, data.lon),
-                    map: map
-                    });
-                })
+                if (!username) {
+                    errors.push('<li>Please enter a username</li>');
+                }
+
+                if (!lat || !lon) {
+                    errors.push('<li>Please select a location</li>');
+                }
+
+                $('#errors').html(errors);
+
+                if (username && lat && lon) {
+                    $.ajax({
+                        type: 'post',
+                        url: '/addLocation',
+                        data: {
+                            username: username,
+                            lat: lat,
+                            lon: lon
+                        },
+                        dataType: 'json'
+                    }).done(function(data) {
+                        new google.maps.Marker({
+                            position: new google.maps.LatLng(data.lat, data.lon),
+                            map: map
+                        });
+                        $("form")[0].reset();
+                    })
+                }
             })
         });
     </script>
