@@ -98,6 +98,8 @@
                             title: username
                         });
                         $("form")[0].reset();
+                        $("#location_lat").val('');
+                        $("#location_lon").val('');
                     }).fail(function(data) {
                         $('#errors').html('<i class="fa fa-exclamation-circle"></i>&nbsp;' + data.responseJSON.message)
                     })

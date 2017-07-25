@@ -48,3 +48,7 @@ footer {
 footer p {
     margin-bottom: .25rem;
 }
+
+#errors p {
+    margin-bottom: 0;
+}
