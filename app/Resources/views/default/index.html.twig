@@ -1,35 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div class="collapse bg-inverse" id="navbarHeader">
-        <div class="container">
-            <div class="row">
-                <div class="col-sm-8 py-4">
-                    <h4 class="text-white">About</h4>
-                    <p class="text-muted">Little project to show the location of Career Change Coders around the world!<br>
-                        Built with Symfony, Javascript and Boostrap. Want to contribute?...submit a PR on GitHub :-)</p>
-                </div>
-                <div class="col-sm-4 py-4">
-                    <h4 class="text-white">Contact</h4>
-                    <ul class="list-unstyled">
-                        <li><a href="https://medium.com/career-change-coder" class="text-white">Read on Medium</a></li>
-                        <li><a href="https://careerchangecoders.herokuapp.com/" class="text-white">Join on Slack</a></li>
-                        <li><a href="https://www.facebook.com/groups/1808933362696140/" class="text-white">Like on Facebook</a></li>
-                        <li><a href="#" class="text-white">Github</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="navbar navbar-inverse bg-inverse">
-        <div class="container d-flex justify-content-between">
-            <a href="/" class="navbar-brand">Career Change Coders</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-        </div>
-    </div>
-
+    {% include 'default/partials/nav.html.twig' %}
     <section class="jumbotron text-center">
         <div class="container">
             <h1 class="jumbotron-heading">User Locations</h1>
@@ -45,11 +17,10 @@
                 </div>
             </form>
             </p>
-            <ul id="errors" class="text-danger"></ul>
+            <div id="errors" class="text-danger text-center"></div>
         </div>
     </section>
-
-    <div class="album text-muted">
+    <div class="map-section text-muted">
         <div class="container">
             <div class="row">
                 <div class="card">
@@ -58,20 +29,12 @@
             </div>
         </div>
     </div>
-
-    <footer class="text-muted">
-        <div class="container">
-            <p class="float-right">
-                <a href="#">Back to top</a>
-            </p>
-            <p>&copy; Career Change Coders</p>
-            <p>If you find a mistake or can improve our code, please feel free to submit a PR on <a href="">Github.</a></p>
-        </div>
-    </footer>
+    {% include 'default/partials/footer.html.twig' %}
     {% endblock %}
 
     {% block javascript %}
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAqACoKPqvIrZ1EQp-njyExDg0oYaG_64o&libraries=places"></script>
+
     <script type="text/javascript">
         $(document).ready(function () {
             var map = new google.maps.Map(document.getElementById('map'), {
@@ -83,7 +46,8 @@
                 $.each(data, function (index, value) {
                     new google.maps.Marker({
                         position: new google.maps.LatLng(value.lat, value.lon),
-                        map: map
+                        map: map,
+                        title: value.username
                     });
                 });
             });
@@ -108,11 +72,11 @@
                 var errors = [];
 
                 if (!username) {
-                    errors.push('<li>Please enter a username</li>');
+                    errors.push('<p><i class="fa fa-exclamation-circle"></i>&nbsp;Please enter a username</p>');
                 }
 
                 if (!lat || !lon) {
-                    errors.push('<li>Please select a location</li>');
+                    errors.push('<p><i class="fa fa-exclamation-circle"></i>&nbsp;Please select a location from the list</p>');
                 }
 
                 $('#errors').html(errors);
@@ -130,9 +94,12 @@
                     }).done(function(data) {
                         new google.maps.Marker({
                             position: new google.maps.LatLng(data.lat, data.lon),
-                            map: map
+                            map: map,
+                            title: username
                         });
                         $("form")[0].reset();
+                    }).fail(function(data) {
+                        $('#errors').html('<i class="fa fa-exclamation-circle"></i>&nbsp;' + data.responseJSON.message)
                     })
                 }
             })

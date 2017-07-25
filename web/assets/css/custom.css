@@ -1,5 +1,5 @@
 body {
-    min-height: 75rem; /* Can be removed; just added for demo purposes */
+    min-height: 75rem;
 }
 
 .navbar {
@@ -25,8 +25,8 @@ body {
     max-width: 40rem;
 }
 
-.album {
-    min-height: 50rem; /* Can be removed; just added for demo purposes */
+.map-section {
+    min-height: 50rem;
     padding-top: 3rem;
     padding-bottom: 3rem;
     background-color: #f7f7f7;
@@ -38,14 +38,6 @@ body {
     padding: .75rem;
     margin-bottom: 2rem;
     border: 0;
-}
-
-.card > img {
-    margin-bottom: .75rem;
-}
-
-.card-text {
-    font-size: 85%;
 }
 
 footer {

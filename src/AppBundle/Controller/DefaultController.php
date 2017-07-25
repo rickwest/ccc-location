@@ -40,10 +40,24 @@ class DefaultController extends Controller
      * @Route("/addLocation", name="addLocation")
      */
     public function addLocationAction(Request $request) {
-        $em = $this->getDoctrine()->getManager();
         $username = $request->request->get('username');
+
         $lat = $request->request->get('lat');
         $lon = $request->request->get('lon');
+        $em = $this->getDoctrine()->getManager();
+
+        $repository = $em->getRepository(UserLocation::class);
+        $existingUserLocation = $repository->findOneBy([
+            'username' => $username,
+            'lat' => $lat,
+            'lon' => $lon
+        ]);
+
+        if ($existingUserLocation) {
+            return $this->json([
+                'message' => 'This username and location have already been added'
+            ], 400);
+        }
 
         $userLocation = new UserLocation();
         $userLocation
@@ -60,5 +74,4 @@ class DefaultController extends Controller
             'lon' => $lon
         ]);
     }
-
 }
